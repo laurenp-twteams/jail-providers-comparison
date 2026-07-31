@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jail commissary and communications provider rankings</title>
+<style>
+:root{color-scheme:light;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:-apple-system,Segoe UI,Helvetica,Arial,sans-serif;background:#ffffff;color:#1a1a1a;}
+.wrap{max-width:1000px;margin:0 auto;padding:20px 24px 60px;}
+h1{font-size:19px;font-weight:600;margin:0 0 4px;}
+.sub{font-size:13px;color:#6b6b6b;margin:0 0 18px;line-height:1.5;}
+.legend{display:flex;gap:16px;font-size:12px;color:#6b6b6b;margin-bottom:16px;flex-wrap:wrap;}
+.legend span{display:inline-flex;align-items:center;gap:6px;}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
+.dot.a{background:#2a78d6;}
+.dot.b{background:#d85a30;}
+.tabs{display:flex;gap:8px;margin-bottom:14px;border-bottom:1px solid #e5e5e3;}
+.tab{padding:9px 4px;font-size:14px;font-weight:500;color:#6b6b6b;cursor:pointer;border-bottom:2px solid transparent;margin-right:14px;}
+.tab.active{color:#1a1a1a;border-bottom-color:#2a78d6;}
+.controls{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+input[type=text]{flex:1;min-width:180px;height:34px;border:1px solid #d8d7d2;border-radius:7px;padding:0 10px;font-size:13px;}
+select{height:34px;border:1px solid #d8d7d2;border-radius:7px;padding:0 8px;font-size:13px;background:#fff;}
+label.chk{font-size:13px;color:#444;display:flex;align-items:center;gap:6px;white-space:nowrap;}
+.count{font-size:12px;color:#999;margin-bottom:8px;}
+.row{border:1px solid #e5e5e3;border-radius:9px;margin-bottom:8px;overflow:hidden;background:#fff;}
+.row-head{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;}
+.row-head:hover{background:#fafaf9;}
+.name{flex:1;font-size:14px;font-weight:500;}
+.tierbadge{font-size:11px;padding:2px 8px;border-radius:5px;background:#f1efe8;color:#5f5e5a;white-space:nowrap;}
+.facbadge{font-size:11px;padding:2px 8px;border-radius:5px;white-space:nowrap;}
+.fac-jail{background:#e1f5ee;color:#085041;}
+.fac-prison{background:#eeedfe;color:#3c3489;}
+.fac-both{background:#f1efe8;color:#5f5e5a;}
+.pill{font-size:12px;font-weight:500;padding:3px 9px;border-radius:12px;white-space:nowrap;min-width:64px;text-align:center;}
+.pill.a{background:#e6f1fb;color:#0c447c;}
+.pill.b{background:#faece7;color:#712b13;}
+.pill.none{background:#f1efe8;color:#888780;}
+.chev{color:#aaa;font-size:12px;transition:transform .15s;}
+.row.open .chev{transform:rotate(90deg);}
+.detail{display:none;border-top:1px solid #e5e5e3;padding:14px;background:#fbfbfa;}
+.row.open .detail{display:block;}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:640px){.cols{grid-template-columns:1fr;}}
+@media(max-width:520px){
+  .row-head{flex-wrap:wrap;}
+  .name{flex-basis:100%;}
+}
+.col h4{font-size:12px;text-transform:uppercase;letter-spacing:.03em;margin:0 0 6px;}
+.col.a h4{color:#185fa5;}
+.col.b h4{color:#993c1d;}
+.col p{font-size:13px;line-height:1.55;margin:0 0 8px;color:#333;}
+.srcs{font-size:11.5px;color:#8a8a85;line-height:1.5;}
+.note{margin-top:10px;padding:9px 11px;background:#faeeda;border-radius:7px;font-size:12.5px;color:#633806;line-height:1.5;}
+.note.verify{background:#eaf3de;color:#27500a;}
+.rank-num{font-weight:600;}
+.empty{text-align:center;color:#999;font-size:13px;padding:30px 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Jail commissary and communications provider rankings</h1>
+<p class="sub">Comparing your v6 report (Report A) against the second research pass you uploaded (Report B). Rankings from both are shown side by side; nothing here has been re-ranked or merged into a single score.</p>
+<div class="legend">
+  <span><span class="dot a"></span>Report A (your v6 document)</span>
+  <span><span class="dot b"></span>Report B (uploaded second pass)</span>
+</div>
+<p class="sub" style="margin-top:-8px;">A pill reading "unranked (grp N)" means Report A placed that company inside its numbered but unranked group of regional specialists at position N &mdash; that's why the numbered ranks above N sometimes skip straight past it.</p>
+<div class="tabs">
+  <div class="tab active" data-cat="communications">Communications</div>
+  <div class="tab" data-cat="commissary">Commissary</div>
+</div>
+<div class="controls">
+  <input type="text" id="search" placeholder="Search company name">
+  <select id="tierFilter">
+    <option value="">All tiers</option>
+    <option value="National">National</option>
+    <option value="Mid-tier">Mid-tier</option>
+    <option value="Regional">Regional / niche</option>
+    <option value="Adjacent">Adjacent / other</option>
+  </select>
+  <select id="rankFilter">
+    <option value="">All companies</option>
+    <option value="both">Ranked in both reports</option>
+    <option value="onlyA">In Report A only</option>
+    <option value="onlyB">In Report B only</option>
+    <option value="disagree">Ranked in both, different order</option>
+  </select>
+  <select id="facilityFilter">
+    <option value="">Jail + prison</option>
+    <option value="Jail">County jail focused</option>
+    <option value="Prison">State / federal prison focused</option>
+    <option value="Both">Serves both</option>
+  </select>
+</div>
+<p class="sub" style="margin:-6px 0 12px;font-style:italic;">Jail vs. prison focus is inferred from how each report described a company's client base, not a separately verified data point &mdash; treat it as a rough sort, not a confirmed fact.</p>
+<div class="count" id="count"></div>
+<div id="list"></div>
+<div class="empty" id="empty" style="display:none;">No companies match these filters.</div>
+</div>
+<script>
+var DATA = {
+communications: [
+{n:"Securus Technologies",t:"National",f:"Both",
+ a:{r:5,x:"Ranks near the bottom of A's tiered list. Its parent Aventiv defaulted on $1.3B in debt in 2024 amid new FCC rate caps, triggering multi-hour outages that cut off calls, video visits, messaging and account access.",s:["The Appeal","PE Stakeholder Project"]},
+ b:{r:6,x:"Worst legal/regulatory record B found: a blocked ICSolutions acquisition, an active Maine wiretapping suit alleging interception of privileged attorney-client calls, a Michigan kickback-scheme suit, and a failed court challenge to FCC rate caps.",s:["Maine Monitor","CBS Detroit","Prison Legal News"]},
+ note:"Both reports rank Securus at or near the bottom, for different reasons (financial distress/outages in A vs. legal exposure in B) &mdash; a rare case where two independent methodologies converge on a similar bottom-of-list placement. Flag: B's Securus entry describes a \"DOJ blocked... Feb. 2025\" acquisition of ICSolutions, while B's own ICSolutions entry separately says the two companies \"nearly merged twice (2018&ndash;19 and 2025).\" The 2018&ndash;19 near-merger is well established elsewhere; the second, 2025 attempt is a more recent and less-corroborated claim worth confirming directly. B also describes the Maine wiretapping suit as currently active &mdash; also worth checking its current status before relying on it.",v:"unverified"},
+{n:"ViaPath Technologies (formerly GTL)",t:"National",f:"Both",
+ a:{r:3,x:"One of the two dominant players, broad service menu, no bankruptcy or default. Minnesota's state report flagged delays in its state-prison accessibility rollout.",s:["Minnesota OBFC report","CalMatters"]},
+ b:{r:5,x:"Multiple substantiated regulatory actions: FTC found ViaPath's response to a 2024 data breach affecting 650,000+ people violated consumer protection law, with a 2025 order requiring $3M in restitution/penalties, plus a separate CFPB action and a West Virginia class settlement over excess charges.",s:["Prison Legal News","FTC.gov"]},
+ note:"The FTC action and $3M penalty are both explicitly cited in Report B's own sourcing (Prison Legal News, June 2025). B's harder ranking versus A likely reflects weighting regulatory penalties more heavily than A did.",v:"verified"},
+{n:"JPay",t:"Adjacent",f:"Prison",
+ a:{r:null,x:"Not ranked. Owned by Aventiv (Securus's parent, not ViaPath's &mdash; corrected from an earlier draft of this report). Primarily a state DOC product (tablets, money transfer, e-messaging) rather than a county jail phone vendor, so not compared against jail-focused providers.",s:["Aventiv company materials"]},
+ b:{r:null,x:"Mentioned only as an Aventiv/Securus subsidiary, not separately profiled or ranked.",s:["AFSC Investigate"]},
+ note:"Both reports agree JPay sits under Aventiv/Securus, not ViaPath.",v:"verified"},
+{n:"ICSolutions",t:"National",f:"Both",
+ a:{r:1,x:"Top-ranked in A: backed by a long-established, financially stable parent (Keefe Group/TKC Holdings) with real national scale and no bankruptcy, default or outage reporting found.",s:["Minnesota OBFC report","Keefe Group materials"]},
+ b:{r:4,x:"Largely clean standalone phone/video record in B too &mdash; the one negative event (DOJ scrutiny of a proposed Securus acquisition) is a concentration concern about Securus, not a complaint against ICSolutions itself.",s:["AFSC Investigate"]},
+ note:"Both reports treat ICSolutions favorably relative to the market; they differ only on exactly how high, not on direction.",v:"verified"},
+{n:"NCIC Inmate Communications",t:"National",f:"Jail",
+ a:{r:2,x:"Its Minnesota per-minute rates ($0.16&ndash;$0.20) were among the lowest of all carriers reviewed there, with no major public controversies found.",s:["Minnesota OBFC report"]},
+ b:{r:1,x:"Top-ranked in B: no litigation, regulatory action or audit finding surfaced despite real national scale (850+ facilities); employee-owned structure and a 2023 merger with Telespan Communications point to steady, unscandalized growth.",s:["Wikipedia","AFSC Investigate"]},
+ note:"Both reports rank NCIC in their top two &mdash; strong agreement. The Sept. 2023 Telespan Communications merger is a detail unique to Report B; Report A doesn't mention it.",v:"verified"},
+{n:"Pay Tel Communications",t:"Mid-tier",f:"Jail",
+ a:{r:null,x:"Listed among national/multi-state mid-tier players; not given an individual numbered rank in A's tiering.",s:["Alabama ICS registry"]},
+ b:{r:null,x:"Not ranked in B either, though noted for joining Securus in an unsuccessful court challenge to 2024 FCC rate caps.",s:["Prison Legal News"]},
+ note:null,v:null},
+{n:"Smart Communications Holdings",t:"Mid-tier",f:"Both",
+ a:{r:6,x:"Ranked last in A. Filed Chapter 11 bankruptcy in November 2024; a December 2024 federal court found its tablets defective and non-compliant, with allegations parts could be used to make weapons.",s:["Prison Legal News"]},
+ b:{r:7,x:"Also ranked last in B, for the same two events: the bankruptcy filing and the federal court's defective/non-compliant tablet finding.",s:["Prison Legal News"]},
+ note:"Full agreement between both reports &mdash; last place in both, same underlying facts.",v:"verified"},
+{n:"Combined Public Communications (CPC)",t:"Mid-tier",f:"Jail",ag:4,
+ a:{r:null,x:"Placed in A's unranked regional group: no independent complaint, financial or investigative data was found to rank it against numbered tiers.",s:[]},
+ b:{r:2,x:"Ranked #2 in B: no adverse findings surfaced; became employee-owned (ESOP) in 2021 with an explicit small/medium-facility focus and no FCC, FTC or CFPB actions found.",s:["AFSC Investigate"]},
+ note:"Meaningful disagreement: A found too little evidence to rank CPC at all; B found a clean record and ranked it #2. Worth treating B's high placement as \"no red flags found,\" not confirmed excellence &mdash; the same caveat B itself applies to other lightly-scrutinized regional players.",v:"unverified"},
+{n:"Correct Solutions Group (CSG)",t:"Mid-tier",f:"Jail",ag:4,
+ a:{r:null,x:"Unranked in A alongside the other regional specialists; certified in Alabama as Correct Solutions, LLC.",s:["Alabama ICS registry"]},
+ b:{r:3,x:"Ranked #3 in B: no litigation, FCC, FTC or CFPB findings surfaced, with the same caveat that it's a smaller, less-scrutinized player than the top tier.",s:["correctsolutionsgroup.com"]},
+ note:"Same pattern as CPC above: B ranked it on a clean record where A judged the evidence too thin to rank at all.",v:"unverified"},
+{n:"TurnKey Corrections (TKC Telecom)",t:"Regional",f:"Jail",ag:4,
+ a:{r:null,x:"Unranked. No independent public complaint or financial data exists to justify ranking it at a specific position, so it sits with the other data-thin regional providers rather than being assigned a number.",s:[]},
+ b:{r:null,x:"Also unranked; no litigation, regulatory action, or audit finding surfaced.",s:["turnkeycorrections.com"]},
+ note:null,v:null},
+{n:"City Tele Coin",t:"Regional",f:"Jail",ag:4,
+ a:{r:null,x:"Unranked regional specialist, hundreds of facilities across the South and Southeast. Possibly the \"CTC\" phone provider in your Bates County, MO notes.",s:[]},
+ b:{r:null,x:"Unranked, described as multi-state and Southeast-concentrated.",s:["AFSC Investigate"]},
+ note:null,v:null},
+{n:"Consolidated Telecom",t:"Regional",f:"Jail",ag:4,
+ a:{r:null,x:"Unranked, Irving TX. An earlier, since-corrected guess linked this company to the \"CTC\" abbreviation in your Bates County notes; City Tele Coin is now considered the stronger match.",s:[]},
+ b:{r:null,x:"Unranked (styled CTEL); explicitly targets county jails and juvenile detention centers across 10 states.",s:["ctel.us"]},
+ note:null,v:null},
+{n:"Crown Correctional Telephone",t:"Regional",f:"Jail",ag:4,a:{r:null,x:"Unranked, Clifton, TX; certified in Alabama.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"ATN, Inc. d/b/a Amtel",t:"Regional",f:"Jail",ag:4,a:{r:null,x:"Unranked, St. Marys, GA; certified in Alabama.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"IWEBVisit",t:"Regional",f:"Jail",ag:4,a:{r:null,x:"Unranked video-visitation specialist, Decatur, AL.",s:[]},b:{r:null,x:"Unranked, described as one of the earliest niche video-visit-only scheduling vendors for smaller facilities.",s:[]},note:null,v:null},
+{n:"HomeWav",t:"Regional",f:"Jail",ag:4,a:{r:null,x:"Unranked; small company, video calling focused; observed in GA in your spreadsheet.",s:[]},b:{r:null,x:"Unranked; Missouri-based, founded 2011, 159 facilities across 31 states, with a documented small-county deployment at Pemiscot County Jail, MO.",s:["cloudcommunications.com"]},note:null,v:null},
+{n:"Encartele (CIDNET)",t:"Regional",f:"Jail",ag:4,a:{r:null,x:"Unranked; likely the \"Cidnet\" provider in your Crawford, IA notes.",s:[]},b:{r:null,x:"Unranked, 450+ facilities, VoIP-based, markets itself as the first Internet Applications Provider for corrections.",s:["encartele.net"]},note:null,v:null},
+{n:"Jail Education Solutions (Edovo) / Legacy Inmate Communications",t:"Regional",f:"Both",ag:4,
+ a:{r:null,x:"Unranked. Edovo's parent, Jail Education Solutions Inc., acquired Legacy Inmate Communications outright (an FCC transfer-of-control filing confirms Legacy is now a wholly owned Edovo subsidiary) &mdash; corrected from an earlier draft that had this backwards.",s:["FCC filings"]},
+ b:{r:null,x:"Lists Edovo and Legacy as two separate, ambiguous entries: Legacy \"self-describes serving 300+ accounts,\" but an August 2020 FCC notice shows GTL filing to acquire certain Legacy assets/customer accounts, leaving Legacy's current ownership unclear to B.",s:["FCC public notice via Prison Legal News, 2020"]},
+ note:"Genuine open question: your v6 report's later research found a direct FCC filing showing Jail Education Solutions (Edovo) as Legacy's current parent. B separately found an earlier 2020 FCC notice about GTL acquiring some Legacy assets. These may be two different, sequential transactions (GTL took some accounts in 2020, Edovo later acquired the remaining company) rather than a contradiction &mdash; worth a direct check if this vendor matters to your work.",v:"unverified"},
+{n:"Public Communications Services (PCS)",t:"Regional",f:"Jail",ag:4,a:{r:null,x:"Unranked; older/legacy vendor, some contracts transitioned to ViaPath/GTL over time.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"Michigan Paytel",t:"Regional",f:"Jail",ag:4,a:{r:null,x:"Unranked, Michigan-specific.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"Telewest IV",t:"Regional",f:"Jail",ag:4,a:{r:null,x:"Unranked, small Colorado vendor, often with auto-renewing contracts.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"CenturyLink Communications",t:"Regional",f:"Jail",a:{r:null,x:"Unranked; general telecom carrier with legacy jail contracts.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"Evercon",t:"Regional",f:"Jail",a:{r:null,x:"Unranked; a Securus subsidiary.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"Reliance Telephone of Grand Forks",t:"Regional",f:"Jail",
+ a:{r:null,x:"Separately flagged (not in the main tier): Minnesota's state ombuds report singled out Reliance for a particularly complicated pricing structure, with calling cards costing up to 2x a standard prepaid account.",s:["Minnesota OBFC report"]},
+ b:{r:null,x:"Unranked but described positively: proprietary per-inmate texting devices with dedicated 10-digit numbers at $0.09/text with a free device.",s:["reliancetelephone.com"]},
+ note:"Notable tension: A's source (a state consumer-protection report) flags Reliance's pricing as a problem; B's source (the company's own marketing) highlights a specific low-cost texting feature. Both can be true at once &mdash; a low-cost add-on feature alongside an overall complicated, costlier calling-card structure.",v:"unverified"},
+{n:"Prodigy Solutions",t:"Regional",f:"Both",a:{r:null,x:"Not covered in this report.",s:[]},b:{r:null,x:"New name from B: Mount Laurel, NJ, founded 2015; single-source voice/video/tablet/messaging/commissary platform marketed for facilities of all sizes.",s:["prodigytel.com"]},note:"New provider surfaced by Report B; not yet cross-checked.",v:"unverified"},
+{n:"Custom Teleconnect",t:"Regional",f:"Jail",a:{r:null,x:"Not covered in this report.",s:[]},b:{r:null,x:"New name from B: Las Vegas, NV, incorporated 1993; facilities-based common carrier and independent payphone provider.",s:["company filings"]},note:"New provider surfaced by Report B; not yet cross-checked.",v:"unverified"},
+{n:"DSI-ITI, LLC",t:"Regional",f:"Jail",a:{r:null,x:"Not covered in this report.",s:[]},b:{r:null,x:"New name from B: appears to function as a GTL/ViaPath subsidiary (its FCC rate filing is hosted on gtl.net) but still contracts directly with some counties under its own name; named as a co-defendant with GTL in overcharging class actions.",s:["classaction.org"]},note:"New provider surfaced by Report B; not yet cross-checked.",v:"unverified"},
+{n:"Renovo Software",t:"Adjacent",f:"Both",a:{r:null,x:"Not covered in this report.",s:[]},b:{r:null,x:"New name from B: video-visitation scheduling/management software (VisManager/VisStation) used by 120+ facilities, usually layered on top of another provider's phone system rather than standalone.",s:[]},note:"New provider surfaced by Report B; not yet cross-checked.",v:"unverified"},
+{n:"VizVox",t:"Adjacent",f:"Both",a:{r:null,x:"Not covered in this report.",s:[]},b:{r:null,x:"New name from B: video-visitation hardware/software, frequently co-branded with ICSolutions (\"ICS Video Visit powered by VizVox\").",s:["Keefe Group materials"]},note:"New provider surfaced by Report B; not yet cross-checked.",v:"unverified"},
+{n:"Ameelio",t:"Adjacent",f:"Both",a:{r:null,x:"Not covered in this report.",s:[]},b:{r:null,x:"New from B: a nonprofit disruptor, not a typical vendor. Founded 2020 by two Yale students; free voice/video/messaging at roughly 35 facilities; claims $1M+/month in aggregate family cost savings. Relevant as pricing/RFP pressure rather than a company to install.",s:["ameelio.org"]},note:"New, non-commercial entry surfaced by Report B; not yet cross-checked, but worth knowing about as a reference point on pricing.",v:"unverified"},
+{n:"Orijin (formerly APDS)",t:"Adjacent",f:"Prison",a:{r:null,x:"Not covered in this report.",s:[]},b:{r:null,x:"New from B: tablet plus learning/reentry platform, renamed from American Prison Data Systems in Nov. 2023; acquired the Honest Jobs employment platform in 2023&ndash;24.",s:["orijin.works"]},note:"New provider surfaced by Report B; not yet cross-checked.",v:"unverified"},
+{n:"“Zupax”",t:"Adjacent",f:"Both",a:{r:null,x:"Not mentioned anywhere in this report.",s:[]},b:{r:null,x:"B flagged this name as unverifiable: no company by this name, or close variants, surfaced in any industry, news, FCC or business-directory source B checked.",s:[]},note:"Both reports converge independently: Report A never mentions this name at all, and Report B explicitly flags it as unverifiable from any source B checked. Likely a misspelling, an extremely small vendor with no online footprint, or defunct &mdash; worth confirming spelling or context directly if this name matters to you.",v:"unverified"}
+],
+commissary: [
+{n:"Keefe Group",t:"National",f:"Both",
+ a:{r:7,x:"Ranks lower in A despite being the largest player by facility count. Most frequent named target of markup and kickback investigative reporting on commissary pricing; described as chronically out of stock in San Quentin News reporting.",s:["Prison Legal News","San Quentin News"]},
+ b:{r:4,x:"Ranked worst in B, with the most severe and best-corroborated findings of any commissary vendor: a Nevada state audit quantifying markups up to 40%, a New Mexico federal antitrust lawsuit alleging markups up to 150%, and a Cuyahoga County, OH price increase of up to 550% shortly after a 2022 contract award &mdash; three independent jurisdictions, three evidence types.",s:["Las Vegas Review-Journal","AOL/Albuquerque Journal","Prison Legal News"]},
+ note:"Strong agreement: both reports rank Keefe last among the national commissary players, and cite overlapping evidence &mdash; a Nevada audit, a New Mexico antitrust suit over markups, and Cuyahoga County, OH price hikes &mdash; a rare case of two independent research passes converging on the same specific findings, not just the same conclusion.",v:"verified"},
+{n:"Trinity Services Group",t:"National",f:"Both",
+ a:{r:1,x:"Top-ranked in A: longest specialization among the majors (35+ years), largest daily reach of the dedicated operators profiled, and no bankruptcy, recall or scandal found.",s:["Trinity company materials"]},
+ b:{r:2,x:"Ranked #2 in B: documented issues are concentrated in food quality, leading to contract terminations in three counties (MI 2018, Richland Co. OH 2024, Rockwall Co. TX 2025), but no audit or antitrust suit alleging systemic price-gouging like its sister company Keefe.",s:["Prison Legal News","richlandsource.com"]},
+ note:"Both reports place Trinity at or near the top &mdash; strong agreement, though B's added detail (three specific contract losses over food quality) is worth folding into how you think about the ranking. Separately, per Report B, Trinity has also acquired Swanson Services Corporation (see Swanson's row below) &mdash; worth confirming directly, since Report A's Swanson entry never mentions this relationship.",v:"verified"},
+{n:"Summit Food Service / Summit Correctional Services",t:"National",f:"Both",
+ a:{r:2,x:"Ranked #2 in A on independently documented scale: 550+ facilities, a 2024 acquisition of CBM Managed Services pushing combined revenue above $230M, and trade-press recognition as Elior North America's 2023 Segment of the Year, with no scandal found.",s:["Food Chain Magazine","FoodService Director"]},
+ b:{r:1,x:"Ranked #1 in B: fewest pricing complaints of the four national players, with the only lawsuit found (a kosher-meal contamination claim, Dale v. Dooley) being a specific incident rather than a systemic pricing practice.",s:["Prison Legal News, 2018"]},
+ note:"Both reports rank Summit at the top of the national tier, for complementary reasons: A found strong growth with no scandals, B found the cleanest pricing-complaint record of the majors.",v:"verified"},
+{n:"Aramark Correctional Services",t:"National",f:"Both",
+ a:{r:8,x:"Ranks last among the majors in A: largest share of the correctional food-service market, but also the most consistently criticized for food quality and quantity, with repeated staff-misconduct allegations.",s:["Prison Legal News","AFSC Investigate"]},
+ b:{r:3,x:"Ranked #3 (of 4) in B, combined with Union Supply Group as one entry: a December 2025 class action (filed in West Virginia) alleges a systemic scheme of shrinking free meals to drive commissary purchases, on top of a history of food-quality complaints and a 2009 riot partly linked to food.",s:["Filter Magazine, Dec. 2025","NCLC complaint filing"]},
+ note:"Report B's West Virginia class-action detail matches its own text closely: filed December 2025, alleging Aramark shrinks free meals to drive commissary purchases, with one named plaintiff citing $4,000+ spent since 2022. Both reports view Aramark unfavorably, though A ranks it dead last while B ranks it just above Keefe since the case is still pending, not yet a proven finding.",v:"verified"},
+{n:"Union Supply Group",t:"National",f:"Prison",
+ a:{r:4,x:"Ranked #4 in A: a long-standing (30+ years) retail specialist with a historical product-quality reputation, now under Aramark's ownership since a 2022 acquisition, though it still bids and wins contracts under its own name (e.g., displacing Aramark's own food-service contract in Milwaukee County, WI in 2024).",s:["Prison Policy Initiative"]},
+ b:{r:null,x:"Not ranked as a separate entity &mdash; B folds Union Supply into the combined \"Aramark Correctional Services / Union Supply Group\" entry (see Aramark row) rather than scoring it independently.",s:[]},
+ note:"Both reports agree on this acquisition: Report A notes it happened in 2022, and Report B adds the specific price ($199.6M, June 2022). The two reports simply model the resulting entity differently &mdash; A keeps Union Supply as its own ranked line since it still operates and bids separately; B treats the combined entity as one line item.",v:"verified"},
+{n:"Swanson Services Corporation",t:"Mid-tier",f:"Jail",
+ a:{r:5,x:"Ranked #5 in A, treated as an independently operating company throughout &mdash; Report A's own text never addresses Swanson's ownership one way or the other. Its integrated financial/trust-account systems and limited complaint history still stand.",s:[]},
+ b:{r:null,x:"Not ranked. B states Trinity Services Group acquired Swanson (\"a formerly-independent Denver commissary/trust-banking vendor with 500+ facility clients in 41 states\"), but doesn't actually give a date for that specific deal &mdash; B's nearby \"~2018\" figure describes when Trinity and Keefe came under common TKC Holdings/H.I.G. Capital ownership, a different event.",s:[]},
+ note:"Flag: only Report B claims Trinity acquired Swanson; Report A treats Swanson as a standalone operator throughout and never mentions this relationship. If accurate, A's #5 Swanson ranking is really rating a Trinity sister brand rather than an independent rival &mdash; worth confirming the acquisition itself, and its date, directly before relying on that read.",v:"unverified"},
+{n:"Walkenhorst's",t:"Mid-tier",f:"Both",
+ a:{r:3,x:"Ranked #3 in A: the most positive documented incarcerated-customer feedback found anywhere in this research. A San Quentin News investigative interview rated Walkenhorst's above Keefe's Access Securepak for having ordered items in stock and honoring promotions.",s:["San Quentin News"]},
+ b:{r:null,x:"Not covered anywhere in this report.",s:[]},
+ note:"A-only finding; B's regional research didn't surface this vendor at all.",v:null},
+{n:"TurnKey Corrections / Kimble's Food by Design",t:"Regional",f:"Jail",ag:6,
+ a:{r:null,x:"Unranked. No independent public evidence exists to justify ranking it at a specific position, consistent with how communications-side TurnKey is treated.",s:[]},
+ b:{r:null,x:"Unranked. B separately lists Kimble's Food by Design as its own regional entry, noting \"possibly now part of TurnKey\" as an open question.",s:["turnkeycorrections.com","kimblesfood.com"]},
+ note:"B's uncertainty about the TurnKey/Kimble's relationship is resolved by Report A's own text: TurnKey acquired Kimble's Food by Design as its Southeast commissary brand. Good independent corroboration that these are the same corporate family.",v:"verified"},
+{n:"Skillet Kitchens (Skillet Food Service)",t:"Adjacent",f:"Jail",
+ a:{r:null,x:"Kitchen-only food-service division of Kimble's Food by Design (your corporate family), launched 2019, LaGrange GA; not included in the commissary ranking since it doesn't run retail commissary.",s:[]},
+ b:{r:null,x:"Not covered anywhere in this report.",s:[]},
+ note:"A-only; this was added at your request in an earlier turn and B's research pass predates or simply didn't surface it.",v:null},
+{n:"Bob Barker Company",t:"Mid-tier",f:"Both",ag:6,a:{r:null,x:"Unranked supply vendor with national reach: 50+ years, NASPO ValuePoint cooperative agreement, South Carolina state contract.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"Oasis Management Systems (JailCanteen)",t:"Mid-tier",f:"Jail",ag:6,
+ a:{r:null,x:"Unranked; Cumming, GA, 5 regional service centers covering 12 Eastern states.",s:[]},
+ b:{r:null,x:"Unranked; described the same way &mdash; East-coast regional, 5 service centers with next-day delivery to 12 Eastern states. Confirmed clients include Western Virginia Regional Jail Authority, New River Valley Regional Jail (VA), and St. Johns County, FL. B notes weak, low-confidence employee-review signals about workplace culture, not service delivery.",s:["jailcanteen.com"]},
+ note:"Strong independent corroboration: both reports found this company through separate research and describe it almost identically.",v:"verified"},
+{n:"ABL Management",t:"Mid-tier",f:"Both",ag:6,
+ a:{r:null,x:"Unranked; a division of Elior Group (Summit's sister company), running both food service and commissary for ~200 corrections and higher-education clients.",s:[]},
+ b:{r:null,x:"Mentioned only in passing, as something \"Summit separately acquired,\" inside the Summit entry rather than profiled on its own.",s:[]},
+ note:"Minor discrepancy: this report's research found ABL Management and Summit are sister companies under the same parent (Elior Group), not that Summit directly acquired ABL. Worth treating B's phrasing as approximate.",v:"corrected"},
+{n:"Continental Distributors d/b/a Canteen Correctional Services",t:"Mid-tier",f:"Jail",ag:6,a:{r:null,x:"Unranked; Michigan-focused, serves large county facilities including Wayne County.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"Jack L. Marcus",t:"Mid-tier",f:"Prison",ag:6,a:{r:null,x:"Unranked; Milwaukee, WI, one of three vendors approved for Wisconsin DOC package sales.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"Stellar Services",t:"Mid-tier",f:"Jail",ag:6,a:{r:null,x:"Unranked; small regional commissary partner to Encartele/CIDNET.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"JailATM",t:"Mid-tier",f:"Jail",ag:6,a:{r:null,x:"Unranked; Jonesboro, AR, commissary ordering, inmate deposits and lobby-kiosk specialist.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"Mid-States Services",t:"Regional",f:"Jail",ag:6,a:{r:null,x:"Unranked; smaller regional bidder observed in Arizona.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"Healthy Cuisine by Ana Amat",t:"Regional",f:"Prison",ag:6,a:{r:null,x:"Unranked; niche specialty and care-package bidder observed at the Florida DOC state level.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"GD Correctional Services",t:"Adjacent",f:"Both",
+ a:{r:null,x:"Classified in A as kitchen-only food service (not retail commissary): Mount Holly, NJ, PA/NJ/DE footprint.",s:[]},
+ b:{r:null,x:"B categorizes it more broadly, as a commissary-adjacent regional alternative to Aramark/Trinity in the NJ/PA corridor, family-owned since 1991, with recent wins at the Philadelphia Dept. of Prisons and Hudson County, NJ.",s:["gdcorrections.com"]},
+ note:"Categorization conflict: A treats this as kitchen-only food service; B treats it as a broader Aramark/Trinity alternative. Worth checking its current service scope directly if this vendor is relevant to you.",v:"unverified"},
+{n:"Cashless Systems (CACTAS)",t:"Regional",f:"Jail",a:{r:null,x:"Not covered in this report.",s:[]},b:{r:null,x:"New from B: Apex, NC, founded 1992, small employee-owned firm; confirmed via its own facility list to serve dozens of small, mostly rural county jails across AR, FL, GA, KS, LA, MS, MO, OH, OK, TN, TX and UT.",s:["cashlesssystems.com"]},note:"New provider surfaced by Report B; not yet cross-checked.",v:"unverified"},
+{n:"Sterling Commissary",t:"Regional",f:"Jail",a:{r:null,x:"Not covered in this report.",s:[]},b:{r:null,x:"New from B: Clifton, TX, founded 2001; orders are placed through the facility's existing inmate phone system, avoiding kiosk hardware costs, aimed at small jails with tight budgets.",s:["sterlingcommissary.com"]},note:"New provider surfaced by Report B; not yet cross-checked.",v:"unverified"},
+{n:"Tiger Correctional / Tiger Commissary Services",t:"Regional",f:"Jail",a:{r:null,x:"Not covered in this report.",s:[]},b:{r:null,x:"New from B: Jonesboro, AR, 50+ years in the industry, serving roughly 200 jails across AR, MS, OK, KS, LA, TN, IL, IN, MO and KY &mdash; a South/Midwest small-to-mid county specialist that also offers jail management software.",s:["tigercorrectional.com"]},note:"New provider surfaced by Report B; not yet cross-checked. Worth a look given how closely its footprint (South/Midwest small counties) overlaps your own.",v:"unverified"},
+{n:"Tigg's Canteen Services",t:"Regional",f:"Jail",a:{r:null,x:"Not covered in this report.",s:[]},b:{r:null,x:"New from B: Coldwater, MI, family-owned since 1932, one of the oldest firms in the space. Serves county jails, elder-nutrition programs, halfway houses and rehab centers across MI, IN and OH; an approved vendor on the Michigan Sheriffs' Association site.",s:["misheriff.org"]},note:"New provider surfaced by Report B; not yet cross-checked.",v:"unverified"},
+{n:"McDaniel Supply Company",t:"Regional",f:"Jail",a:{r:null,x:"Not covered in this report.",s:[]},b:{r:null,x:"New from B: commissary-only (no food service) across GA, SC, NC, TN and FL; confirmed vendor for Forsyth County, GA and Brunswick County, NC.",s:["mcdanielsupplyco.net"]},note:"New provider surfaced by Report B; not yet cross-checked.",v:"unverified"},
+{n:"CorrectPay",t:"Regional",f:"Both",a:{r:null,x:"Not covered in this report.",s:[]},b:{r:null,x:"New from B: a newer, less-documented multi-service app covering commissary deposits, video visitation, messaging and bonding deposits; parent company and founding date could not be confirmed by B from public sources.",s:["correctpay.com"]},note:"New provider surfaced by Report B; not yet cross-checked, and B itself flags this one as thinly documented.",v:"unverified"},
+{n:"Sodexo",t:"Adjacent",f:"Both",a:{r:null,x:"Kitchen-only food service, national.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"Compass Group (Canteen vending line)",t:"Adjacent",f:"Both",a:{r:null,x:"Kitchen-only food service and vending, national, some commissary crossover.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"The Nutrition Group",t:"Adjacent",f:"Both",a:{r:null,x:"Kitchen-only food service, Eastern US.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null},
+{n:"Consolidated Management",t:"Adjacent",f:"Both",a:{r:null,x:"Kitchen-only food service, 14 Midwestern states.",s:[]},b:{r:null,x:"Not covered in this report.",s:[]},note:null,v:null}
+]
+};
+
+var state = {cat:"communications", q:"", tier:"", rankMode:"", facility:""};
+var FACILITY_LABEL = {Jail:"County jail", Prison:"State / federal prison", Both:"Jail + prison"};
+var FACILITY_CLASS = {Jail:"fac-jail", Prison:"fac-prison", Both:"fac-both"};
+
+function esc(s){return (s||"").toString();}
+
+function pill(cls, txt){return '<span class="pill '+cls+'">'+txt+'</span>';}
+
+function rankPill(entry, kind, groupNum){
+  if(!entry) return pill("none","not covered");
+  if(entry.r===null || entry.r===undefined){
+    if(groupNum) return pill("none","unranked (grp "+groupNum+")");
+    return pill("none","unranked");
+  }
+  return pill(kind, "#"+entry.r);
+}
+
+function coveredBy(entry){
+  return !(entry && entry.x && entry.x.indexOf("Not covered") !== -1);
+}
+
+function matchesFilters(item){
+  if(state.q && item.n.toLowerCase().indexOf(state.q.toLowerCase())===-1) return false;
+  if(state.tier && item.t!==state.tier) return false;
+  if(state.facility && item.f!==state.facility) return false;
+  var inA = coveredBy(item.a), inB = coveredBy(item.b);
+  var aR = item.a && item.a.r!=null, bR = item.b && item.b.r!=null;
+  if(state.rankMode==="both" && !(aR&&bR)) return false;
+  if(state.rankMode==="onlyA" && !(inA && !inB)) return false;
+  if(state.rankMode==="onlyB" && !(inB && !inA)) return false;
+  if(state.rankMode==="disagree" && !(aR && bR && item.a.r!==item.b.r)) return false;
+  return true;
+}
+
+function render(){
+  var items = DATA[state.cat].filter(matchesFilters);
+  var list = document.getElementById("list");
+  var empty = document.getElementById("empty");
+  document.getElementById("count").textContent = items.length + " compan" + (items.length===1?"y":"ies") + " shown";
+  if(items.length===0){ list.innerHTML=""; empty.style.display="block"; return; }
+  empty.style.display="none";
+  list.innerHTML = items.map(function(item, idx){
+    var noteHtml = "";
+    if(item.note){
+      var cls = item.v==="verified" ? "note verify" : "note";
+      noteHtml = '<div class="'+cls+'">'+item.note+'</div>';
+    }
+    var srcA = (item.a.s&&item.a.s.length) ? '<div class="srcs">Source: '+item.a.s.join("; ")+'</div>' : "";
+    var srcB = (item.b.s&&item.b.s.length) ? '<div class="srcs">Source: '+item.b.s.join("; ")+'</div>' : "";
+    return '<div class="row" data-idx="'+idx+'">'+
+      '<div class="row-head" onclick="toggleRow(this)">'+
+        '<span class="chev">&#9656;</span>'+
+        '<span class="name">'+esc(item.n)+'</span>'+
+        '<span class="tierbadge">'+esc(item.t)+'</span>'+
+        '<span class="facbadge '+FACILITY_CLASS[item.f]+'">'+FACILITY_LABEL[item.f]+'</span>'+
+        rankPill(item.a,"a",item.ag)+
+        rankPill(item.b,"b",null)+
+      '</div>'+
+      '<div class="detail"><div class="cols">'+
+        '<div class="col a"><h4>Report A</h4><p>'+esc(item.a.x)+'</p>'+srcA+'</div>'+
+        '<div class="col b"><h4>Report B</h4><p>'+esc(item.b.x)+'</p>'+srcB+'</div>'+
+      '</div>'+noteHtml+'</div>'+
+    '</div>';
+  }).join("");
+}
+
+function toggleRow(headEl){
+  headEl.parentElement.classList.toggle("open");
+}
+
+document.querySelectorAll(".tab").forEach(function(tab){
+  tab.addEventListener("click", function(){
+    document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("active");});
+    tab.classList.add("active");
+    state.cat = tab.getAttribute("data-cat");
+    render();
+  });
+});
+document.getElementById("search").addEventListener("input", function(e){ state.q = e.target.value; render(); });
+document.getElementById("tierFilter").addEventListener("change", function(e){ state.tier = e.target.value; render(); });
+document.getElementById("rankFilter").addEventListener("change", function(e){ state.rankMode = e.target.value; render(); });
+document.getElementById("facilityFilter").addEventListener("change", function(e){ state.facility = e.target.value; render(); });
+
+render();
+</script>
+</body>
+</html>
